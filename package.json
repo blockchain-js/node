@@ -1,0 +1,26 @@
+{
+    "name": "node",
+    "version": "1.0.0",
+    "description": "Implementation of the node for the blockchain",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/blockchain-js/_Node.git"
+    },
+    "author": "Yordan gGalabov",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/blockchain-js/_Node/issues"
+    },
+    "rules": {
+        "start": "node server.js"
+    },
+    "homepage": "https://github.com/blockchain-js/_Node#readme",
+    "dependencies": {
+        "body-parser": "^1.18.2",
+        "express": "^4.16.2"
+    }
+}
