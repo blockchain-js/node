@@ -1,16 +1,26 @@
 class Transaction {
-    constructor(from, to, value, senderPubKey, senderSignature, transactionHash, dateReceived, minedInBlockIndex, paid, fee) {
-        this.from = from;
-        this.to = to;
-        this.value = value;
-        this.senderPubKey = senderPubKey;
-        this.senderSignature = senderSignature;
-        this.transactionHash = transactionHash;
-        this.dateReceived = dateReceived;
-        this.minedInBlockIndex = minedInBlockIndex;
-        this.paid = paid;
-        this.fee = fee;
+    constructor(from, to, value, fee, senderPubKey, senderSignature, transactionHash, minedInBlockIndex,
+        paid) {
+        this.from = from //address
+        this.to = to //address
+        this.value = value //integer
+        this.fee = fee //integer
+        this.dateCreated = new Date().getTime() //timestamp
+        this.senderPubKey = senderPubKey //hex_number
+        this.senderSignature = senderSignature //hex_number[2]
+        this.transactionHash = transactionHash //hex_number
+        this.minedInBlockIndex = minedInBlockIndex //number / null
+        this.transferSuccessful = paid //bool
     }
 }
+
+
+
+
+
+
+
+
+
 
 module.exports = Transaction;
