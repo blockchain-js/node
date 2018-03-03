@@ -26,7 +26,7 @@ class Blockchain {
     }
 
     getBlockchain() {
-        return this.blocks;
+        return this.chain;
     }
 
     addBlock(blockToAdd) {
