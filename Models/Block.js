@@ -24,7 +24,7 @@ class Block {
       blockDataHash: this.blockDataHash,
       nonce: this.nonce,
       dateCreated: this.dateCreated
-    }.toString()).digest()
+    }.toString()).digest('hex')
   }
 }
 

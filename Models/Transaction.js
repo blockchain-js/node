@@ -19,7 +19,7 @@ class Transaction {
         value: this.value,
         fee: this.fee,
         dateCreated: this.dateCreated
-      }.toString()).digest()
+      }.toString()).digest('hex')
     }
 }
 
