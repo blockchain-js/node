@@ -1,35 +1,31 @@
-const SHA256 = require('crypto-js/sha256')
+const crypto = require('crypto')
 const transaction = require('./Transaction')
 
 class Block {
-    constructor(index, transactions, difficulty, prevBlockHash, minedBy, blockDataHash, blockHash, nonce, dateCreated) {
-        this.index = index // number
-        this.transactions = transactions // Transaction[]
-        this.transactionsHash = SHA256(transactions)
-        this.difficulty = difficulty // number
-        this.prevBlockHash = prevBlockHash // hex_number
-        this.minedBy = minedBy // address
-        this.blockDataHash = blockDataHash // hex_number
-        this.nonce = nonce // number
-        this.dateCreated = dateCreated // timestamp
-        this.blockHash = this.calculateHash() // hex_number
-    }
+  constructor(index, transactions, difficulty, prevBlockHash, minedBy, blockDataHash, blockHash, nonce, dateCreated) {
+    this.index = index
+    this.transactions = transactions
+    this.difficulty = difficulty
+    this.prevBlockHash = prevBlockHash
+    this.minedBy = minedBy
+    this.blockDataHash = blockDataHash
+    this.nonce = nonce
+    this.dateCreated = dateCreated
+    this.blockHash = this.calculateHash()
+  }
 
-    calculateHash() {
-        return SHA256(this.index +
-            this.transactions +
-            this.difficulty +
-            this.prevBlockHash +
-            this.minedBy +
-            this.blockDataHash +
-            this.nonce +
-            this.dateCreated
-        );
-    }
-
-    logHash() {
-        console.log(this.blockHash)
-    }
+  calculateHash() {
+    return crypto.createHash('sha256').update({
+      index: this.index,
+      transactions: this.transactions,
+      difficulty: this.difficulty,
+      prevBlockHash: this.prevBlockHash,
+      minedBy: this.minedBy,
+      blockDataHash: this.blockDataHash,
+      nonce: this.nonce,
+      dateCreated: this.dateCreated
+    }.toString()).digest()
+  }
 }
 
 

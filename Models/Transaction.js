@@ -19,8 +19,8 @@ class Transaction {
         value: this.value,
         fee: this.fee,
         dateCreated: this.dateCreated
-      }).digest()
+      }.toString()).digest()
     }
 }
 
-module.exports = Transaction;
+module.exports = Transaction

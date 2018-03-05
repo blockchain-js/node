@@ -14,19 +14,21 @@ module.exports.getInfo = (blockchain) => {
 
 module.exports.getBlocks = (blockchain) => {
   return (req, res) => {
-    res.send(blockchain.chain)
+    res.send(blockchain.blocks)
   }
 }
 
 module.exports.getBlockByIndex = (blockchain) => {
   return (req, res) => {
-    res.send(blockchain.chain[req.params.index])
+    res.send(blockchain.blocks[req.params.index])
   }
 }
 
 module.exports.notify = (blockchain) => {
   return (req, res) => {
-    throw new Error('Not implemented')
+    res.send({
+      message: 'Thank you!'
+    })
   }
 }
 
@@ -53,8 +55,7 @@ module.exports.createTransaction = (blockchain) => {
     const transaction = blockchain.createTransaction(data)
     res.status(201).send({
       "transactionHash": transaction.transactionHash
-    }
-    )
+    })
   }
 }
 
@@ -93,4 +94,14 @@ module.exports.getBalance = (blockchain) => {
   }
 }
 
+module.exports.getMiningBlock = (blockchain) => {
+  return (req, res) => {
+    throw new Error('Not implemented')
+  }
+}
 
+module.exports.postPOW = (blockchain) => {
+  return (req, res) => {
+    throw new Error('Not implemented')
+  }
+}
