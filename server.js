@@ -1,108 +1,44 @@
 // server.js
-const app = require('./index.js')
-const block = require('./Models/Block.js')
-const blockchain = require('./Models/Blockchain.js')
-
+const express = require('express')
+const cors = require('cors')
+const bodyParser = require("body-parser")
 const port = process.env.PORT || 3000;
+const Blockchain = require('./models/Blockchain.js')
+const nodeCtrl = require('./controllers/node')
 
-let my_blockchain = new blockchain();
-console.log(JSON.stringify(my_blockchain))
+// Blockchain instance
+let blockchain = new Blockchain();
 
+// Config
+const app = express()
+app.use(cors())
+app.use(bodyParser.json())
 
-//ENDPOINTS
-app.get('/', function(req, res) {
-    res.send('Welcome to blockchain.js!')
-})
+// Routes
+app.get('/info', nodeCtrl.getInfo(blockchain));
+app.get('/blocks', nodeCtrl.getBlocks(blockchain));
+app.get('/blocks/:index', nodeCtrl.getBlockByIndex(blockchain))
+app.post('/blocks/notify', nodeCtrl.notify(blockchain));
+app.get('/peers', nodeCtrl.getPeers(blockchain));
+app.post('/peers', nodeCtrl.addPeer(blockchain));
+app.post('/transactions/send', nodeCtrl.createTransaction(blockchain));
+app.get('/transactions/:transactionHash', nodeCtrl.getTransaction(blockchain));
+app.get('/transactions/:transactionHash/info', nodeCtrl.getTransactionInfo(blockchain));
+app.get('/balance/:address/confirmations/:confirmations', nodeCtrl.getBalance(blockchain));
 
-
-app.get('/info', (req, res) => {
-    const info = {
-        about: "SoftUniChain/0.0009-nodeJs",
-        nodeName: "JS-Node-1",
-        confirmedTransactions: [],
-        peers: [],
-        blocks: [],
-        pendingTransactions: [],
-        addresses: [],
-        coins: 100
-    };
-
-    res.send(info);
-});
-
-app.get('/blocks', (req, res) => {
-    const blockInfo = {
-        index: block.index,
-        transactions: block.transactions,
-        difficulty: block.difficulty,
-        prevBlockHash: block.prevBlockHash,
-        minedBy: block.minedBy,
-        blockDataHash: block.blockDataHash,
-        nonce: block.nonce,
-        dateCreated: block.dateCreated,
-        blockHash: block.blockHash
-    };
-
-    res.send(blockInfo);
-})
-
-app.get('/blocks:index', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-})
-
-app.post('/blocks/notify', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-});
-
-app.get('/peers', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
-});
-
-app.post('/peers', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
-});
-
-app.get('/transactions/:transactionHash', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
-});
-app.post('/transactions', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
-});
-app.get('/balance/:transactionHash/confirmations/:confirmationNum', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
-});
 app.post('/mine', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
+  //returm block at currentIndex
+  res.send()
+  // return peers array
 });
 app.post('/mine/submit/:blockNum', (req, res) => {
-    //returm block at currentIndex
-    res.send()
-        // return peers array
+  //returm block at currentIndex
+  res.send()
+  // return peers array
 });
 
 app.all('*', (req, res) => {
-    res.status(404);
-    res.send('404 Not Found');
-    res.end();
+  res.sendStatus(404);
 });
 
-
-
-
-app.listen(port, function() {
-    console.log('Express server listening on port ' + port);
-});
+app.listen(port, () => (console.log('Express server listening on port ' + port)));

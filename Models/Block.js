@@ -30,7 +30,6 @@ class Block {
     logHash() {
         console.log(this.blockHash)
     }
-
 }
 
 

@@ -1,26 +1,26 @@
+const crypto = require('crypto')
+
 class Transaction {
-    constructor(from, to, value, fee, senderPubKey, senderSignature, transactionHash, minedInBlockIndex,
-        paid) {
-        this.from = from //address
-        this.to = to //address
-        this.value = value //integer
-        this.fee = fee //integer
-        this.dateCreated = new Date().getTime() //timestamp
-        this.senderPubKey = senderPubKey //hex_number
-        this.senderSignature = senderSignature //hex_number[2]
-        this.transactionHash = transactionHash //hex_number
-        this.minedInBlockIndex = minedInBlockIndex //number / null
-        this.transferSuccessful = paid //bool
+    constructor(from, to, value, fee, senderPubKey, date) {
+        this.from = from
+        this.to = to
+        this.value = value
+        this.fee = fee
+        this.dateCreated = new Date(date).getTime()
+        this.senderPubKey = senderPubKey 
+        this.transactionHash = this.getTransactionHash()
+    }
+
+    getTransactionHash() {
+      return crypto.createHash('sha256').update({
+        from: this.from,
+        to: this.to,
+        senderPubKey: this.senderPubKey,
+        value: this.value,
+        fee: this.fee,
+        dateCreated: this.dateCreated
+      }).digest()
     }
 }
-
-
-
-
-
-
-
-
-
 
 module.exports = Transaction;
