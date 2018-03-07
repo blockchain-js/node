@@ -9,7 +9,8 @@ class Blockchain {
     this.transactions = []
     this.pendingTransactions = []
     this.cummulativeDifficulty = []
-    this.difficulty = 0
+    this.peers = []
+    this.difficulty = 5
   }
 
   createGenesisBlock() {
@@ -44,6 +45,8 @@ class Blockchain {
   createTransaction(transactionData) {
     const transaction = new Transaction(transactionData.from, transactionData.to, transactionData.value, transactionData.fee, transactionData.senderPubKey, transactionData.date)
     this.pendingTransactions.push(transaction)
+    this.incBalance(transactionData.to, value)
+    this.decBalance(transactionData.from, value)
   } 
   
   getBalance(addr) {
@@ -55,6 +58,17 @@ class Blockchain {
     return this.balances[addr]
   }
 
+  decBalance(addr, value) {
+    this.balances[addr] -= value
+  }
+
+  incBalance(addr, value) {
+    if (!this.balances[addr]) {
+      this.balances[addr] = 0
+    }
+    this.balances[addr] += value
+  }
+
   addPeer(url) {
     this.peers.push(url)
   }
@@ -62,6 +76,10 @@ class Blockchain {
   getPeers() {
     return this.peers
   } 
+
+  getMiningBlock() {
+    
+  }
 }
 
 module.exports = Blockchain

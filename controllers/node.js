@@ -96,12 +96,32 @@ module.exports.getBalance = (blockchain) => {
 
 module.exports.getMiningBlock = (blockchain) => {
   return (req, res) => {
-    throw new Error('Not implemented')
+    res.send(blockchain.getMiningBlock())
   }
 }
 
 module.exports.postPOW = (blockchain) => {
   return (req, res) => {
-    throw new Error('Not implemented')
+    const data = req.body
+    const block = blockchain.createBlock(data)
+
+    if (!block.isValid()) {
+      res.sendStatus(400)
+    }
+
+    blockchain.addBlock(req.body)
+    blockchain.incBalance(block.minedBy, 500)
+    
+    this.notifyPeers()
+
+    res.send({
+      status: 'accepted',
+      message: 'Block accepted, expected reward: 500 coins'
+    })
   }
+}
+
+const notifyPeers = () => {
+  const peers = blockchain.getPeers()
+
 }
