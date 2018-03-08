@@ -5,12 +5,17 @@ class Blockchain {
 
   constructor() {
     this.blocks = [this.createGenesisBlock()]
-    this.balances = []
     this.transactions = []
     this.pendingTransactions = []
-    this.cummulativeDifficulty = []
-    this.peers = []
+    this.baseTarget = 2
     this.difficulty = 5
+    this.cummulativeDifficulty = this.getCummulativeDifficulty(this.difficulty)
+    this.peers = []
+    this.minerReward = 500
+  }
+
+  getCummulativeDifficulty(difficulty) {
+    return difficulty + (2^64 / this.baseTarget)
   }
 
   createGenesisBlock() {
@@ -37,6 +42,9 @@ class Blockchain {
   }
 
   addBlock(blockToAdd) {
+    // Filter pending transactions
+    // Update the transactions
+
     blockToAdd.prevBlockHash = this.getLatestBlock().blockHash
     blockToAdd.blockHash = blockToAdd.calculateHash()
     this.blocks.push(blockToAdd)
@@ -50,23 +58,21 @@ class Blockchain {
   } 
   
   getBalance(addr) {
-    return this.balances[addr]
+    // From transactions
   }
 
   hasBalance(addr, value) {
-    if (value) return (this.balances[addr] - value) > 0
-    return this.balances[addr]
+    const balance = this.getBalance(addr)
+    if (value) return (balance - value) > 0
+    return balance
   }
 
   decBalance(addr, value) {
-    this.balances[addr] -= value
+    // Create transaction
   }
 
   incBalance(addr, value) {
-    if (!this.balances[addr]) {
-      this.balances[addr] = 0
-    }
-    this.balances[addr] += value
+   // Create transaction
   }
 
   addPeer(url) {
@@ -79,6 +85,10 @@ class Blockchain {
 
   getMiningBlock() {
     
+  }
+
+  getTransactionInfo(hash) {
+    return this.transactions.find(t => t.transactionHash === hash)
   }
 }
 

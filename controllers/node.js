@@ -1,8 +1,8 @@
 module.exports.getInfo = (blockchain) => {
   return (req, res) => {
     res.send({
-      about: "SoftUniChain/0.0009-nodeJs",
-      nodeName: "JS-Node-1",
+      about: "SoftUniChain/Blockchain",
+      nodeName: "JS-Node",
       peers: blockchain.peers.length,
       blocks: blockchain.blocks.length,
       pendingTransactions: blockchain.pendingTransactions.length,
@@ -26,9 +26,13 @@ module.exports.getBlockByIndex = (blockchain) => {
 
 module.exports.notify = (blockchain) => {
   return (req, res) => {
-    res.send({
-      message: 'Thank you!'
-    })
+    const data = req.body
+    const latestBlock = blockchain.getLatestBlock()
+
+    if (data.index >= latestBlock.index &&
+      data.cummulativeDifficulty > blockchain.getCummulativeDifficulty(latestBlock.difficulty)) {
+      // Get the longer chain
+    }
   }
 }
 
@@ -53,21 +57,29 @@ module.exports.createTransaction = (blockchain) => {
     }
 
     const transaction = blockchain.createTransaction(data)
+    // Calculates the transaction hash
+    // Checks for collisions  duplicated transactions are skipped
+    // Checks for missing / invalid fields
+    // Validates the transaction signature
+    // Puts the transaction in the "pending transactions" pool
+    // Sends the transaction to all peer nodes through the REST API
+    // The transaction is sent from peer to peer until it reaches the entire network
+
     res.status(201).send({
       "transactionHash": transaction.transactionHash
     })
   }
 }
 
-module.exports.getTransaction = (blockchain) => {
-  return (req, res) => {
-    throw new Error('Not implemented')
-  }
-}
-
 module.exports.getTransactionInfo = (blockchain) => {
   return (req, res) => {
-    throw new Error('Not implemented')
+    const transaction = blockchain.getTransactionInfo(req.params.transactionHash)
+
+    if (!transaction) {
+      return res.sendstatus(404)
+    }
+
+    res.status(200).send(transaction)
   }
 }
 
@@ -87,9 +99,9 @@ module.exports.getBalance = (blockchain) => {
 
     res.send({
       "address": address,
-      "confirmedBalance": balance,
-      "lastMinedBalance": balance,
-      "pendingBalance": balance
+      "confirmedBalance": balance,// TODO
+      "lastMinedBalance": balance,// TODO
+      "pendingBalance": balance// TODO
     })
   }
 }
@@ -110,18 +122,21 @@ module.exports.postPOW = (blockchain) => {
     }
 
     blockchain.addBlock(req.body)
-    blockchain.incBalance(block.minedBy, 500)
-    
-    this.notifyPeers()
+    blockchain.incBalance(block.minedBy, blockchain.minerReward)
+
+    this.notifyPeers(block.index, blockchain.getCummulativeDifficulty(block.difficulty))
 
     res.send({
       status: 'accepted',
-      message: 'Block accepted, expected reward: 500 coins'
+      message: `Block accepted, expected reward: ${blockchain.minerReward} coins`
     })
   }
 }
 
-const notifyPeers = () => {
+const notifyPeers = (index, cummulativeDifficulty) => {
   const peers = blockchain.getPeers()
 
+  peers.forEach(url => {
+    // Notify
+  });
 }
