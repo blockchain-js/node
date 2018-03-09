@@ -12,18 +12,20 @@ class Blockchain {
     this.cummulativeDifficulty = this.getCummulativeDifficulty(this.difficulty)
     this.peers = []
     this.minerReward = 500
+    this.confirmations = 8
   }
 
   getCummulativeDifficulty(difficulty) {
-    return difficulty + (2^64 / this.baseTarget)
+    return difficulty + (2 ^ 64 / this.baseTarget)
   }
 
   createGenesisBlock() {
     const initialTransaction = {
       from: '0x00',
-      to: '0x00',
+      to: 'a5dc6bcbfeeab523ffc995e344725e6207b7f69f',
       value: 500,
       fee: 50,
+      transactions: [],
       senderPubKey: '',
       senderSignature: '',
       transactionHash: '',
@@ -55,10 +57,46 @@ class Blockchain {
     this.pendingTransactions.push(transaction)
     this.incBalance(transactionData.to, value)
     this.decBalance(transactionData.from, value)
-  } 
-  
-  getBalance(addr) {
-    // From transactions
+  }
+
+  getPendingBalance(addr) {
+    const balance = this.getBalance(addr)
+    const pendingTransactionsBalance = (this.pendingTransactions || [])
+      .reduce((val, tr) => {
+        if (tr.from === addr) {
+          val -= tr.value
+        } else if (tr.to === addr) {
+          val += tr.value
+        }
+
+        return val
+      }, 0)
+
+    return balance + pendingTransactionsBalance
+  }
+
+  getBalance(addr, confirmations) {
+    const blocks = this.blocks || []
+    if (confirmations) {
+      if (blocks.length < confirmations) {
+        return 0
+      }
+      blocks = blocks.slice(0, blocks.length - confirmations)
+    }
+
+    return blocks
+      .flatMap((block) => {
+        return block.transactions || []
+      })
+      .reduce((val, tr) => {
+        if (tr.from === addr) {
+          val -= tr.value
+        } else if (tr.to === addr) {
+          val += tr.value
+        }
+
+        return val
+      }, 0)
   }
 
   hasBalance(addr, value) {
@@ -72,7 +110,7 @@ class Blockchain {
   }
 
   incBalance(addr, value) {
-   // Create transaction
+    // Create transaction
   }
 
   addPeer(url) {
@@ -81,10 +119,10 @@ class Blockchain {
 
   getPeers() {
     return this.peers
-  } 
+  }
 
   getMiningBlock() {
-    
+
   }
 
   getTransactionInfo(hash) {

@@ -2,9 +2,10 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require("body-parser")
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3030
 const Blockchain = require('./models/Blockchain.js')
 const nodeCtrl = require('./controllers/node')
+const polifils = require('./polyfills.js')
 
 // Blockchain instance
 let blockchain = new Blockchain()
@@ -24,6 +25,7 @@ app.post('/peers', nodeCtrl.addPeer(blockchain))
 app.post('/transactions/send', nodeCtrl.createTransaction(blockchain))
 app.get('/transactions/:transactionHash/info', nodeCtrl.getTransactionInfo(blockchain))
 app.get('/balance/:address/confirmations/:confirmations', nodeCtrl.getBalance(blockchain))
+app.get('/balance/:address', nodeCtrl.getBalance(blockchain))
 app.post('/mining/get-block/:minerAddr', nodeCtrl.getMiningBlock)
 app.post('/mining/submit-block/:minerAddr', nodeCtrl.postPOW)
 app.all('*', (req, res) => res.sendStatus(404))

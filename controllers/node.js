@@ -1,3 +1,7 @@
+// HTTP status codes
+const status = require('http-status')
+const { celebrate, Joi } = require('celebrate')
+
 module.exports.getInfo = (blockchain) => {
   return (req, res) => {
     res.send({
@@ -52,7 +56,7 @@ module.exports.createTransaction = (blockchain) => {
   return (req, res) => {
     const data = req.body
 
-    if (!blockchain.hasBalance(data.from, data.value)) {
+    if (!blockchain.hasBalance(data.from, data.value | 0)) {
       return res.sendStatus(400)
     }
 
@@ -88,20 +92,22 @@ module.exports.getBalance = (blockchain) => {
     const addr = req.params.address
     if (!blockchain.hasBalance(addr)) {
       return res.send({
-        "address": addr,
-        "confirmedBalance": 0,
-        "lastMinedBalance": 0,
-        "pendingBalance": 0
+        balance: {
+          "address": addr,
+          "confirmedBalance": { confirmations: blockchain.confirmations, balance: 0 },
+          "lastMinedBalance": { confirmations: 1, balance: 0 },
+          "pendingBalance": { confirmations: 0, balance: 0 }
+        }
       })
     }
 
-    const balance = blockchain.getBalance(addr)
-
     res.send({
-      "address": address,
-      "confirmedBalance": balance,// TODO
-      "lastMinedBalance": balance,// TODO
-      "pendingBalance": balance// TODO
+      balance: {
+        "address": addr,
+        "confirmedBalance": { confirmations: blockchain.confirmations, balance: blockchain.getBalance(addr, req.params.confirmations || blockchain.confirmations) },
+        "lastMinedBalance": { confirmations: 1, balance: blockchain.getBalance(addr) },
+        "pendingBalance": { confirmations: 0, balance: blockchain.getPendingBalance(addr) }
+      }
     })
   }
 }

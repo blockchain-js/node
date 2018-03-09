@@ -21,7 +21,9 @@
   "homepage": "https://github.com/blockchain-js/_Node#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "celebrate": "^7.0.4",
     "cors": "^2.8.4",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "http-status": "^1.0.1"
   }
 }
