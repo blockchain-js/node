@@ -1,6 +1,5 @@
 // HTTP status codes
 const status = require('http-status')
-const { celebrate, Joi } = require('celebrate')
 
 module.exports.getInfo = (blockchain) => {
   return (req, res) => {
@@ -61,11 +60,12 @@ module.exports.createTransaction = (blockchain) => {
     }
 
     const transaction = blockchain.createTransaction(data)
-    // Calculates the transaction hash
-    // Checks for collisions  duplicated transactions are skipped
-    // Checks for missing / invalid fields
-    // Validates the transaction signature
-    // Puts the transaction in the "pending transactions" pool
+    if (blockchain.hasTransaction(transaction.hash) || !transaction.isValid(data.senderSignature)) {
+      return res.sendStatus(400)
+    }
+
+    blockchain.addTransaction(transaction)
+
     // Sends the transaction to all peer nodes through the REST API
     // The transaction is sent from peer to peer until it reaches the entire network
 

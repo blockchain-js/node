@@ -22,9 +22,9 @@ class Blockchain {
   createGenesisBlock() {
     const initialTransaction = {
       from: '0x00',
-      to: 'a5dc6bcbfeeab523ffc995e344725e6207b7f69f',
-      value: 500,
-      fee: 50,
+      to: '0x00',
+      value: 0,
+      fee: 0,
       transactions: [],
       senderPubKey: '',
       senderSignature: '',
@@ -32,7 +32,7 @@ class Blockchain {
       minedInBlockIndex: '',
       transferSuccessful: true
     }
-    return new Block(0, [initialTransaction], 5, '123', 'miner', 'abc1', 'block_data_hash', 'blockhash', 1, 1 / 2 / 2018)
+    return new Block(0, [initialTransaction], 0, '', '', '', '', '', '', new Date())
   }
 
   getLatestBlock() {
@@ -53,10 +53,16 @@ class Blockchain {
   }
 
   createTransaction(transactionData) {
-    const transaction = new Transaction(transactionData.from, transactionData.to, transactionData.value, transactionData.fee, transactionData.senderPubKey, transactionData.date)
+    return new Transaction(transactionData.from, transactionData.to, transactionData.value, transactionData.fee, transactionData.senderPubKey, transactionData.dateCreated)
+  }
+
+  hasTransaction(transactionHash) {
+    return this.transactions.concat(this.pendingTransactions)
+      .some(tr => tr.transactionHash === transactionHash)
+  }
+
+  addTransaction(transaction) {
     this.pendingTransactions.push(transaction)
-    this.incBalance(transactionData.to, value)
-    this.decBalance(transactionData.from, value)
   }
 
   getPendingBalance(addr) {
