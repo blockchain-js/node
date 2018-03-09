@@ -20,10 +20,17 @@ app.use(bodyParser.json())
 app.get('/info', nodeCtrl.getInfo(blockchain))
 app.get('/blocks', nodeCtrl.getBlocks(blockchain))
 app.get('/blocks/:index', nodeCtrl.getBlockByIndex(blockchain))
-app.post('/blocks/notify', nodeCtrl.notify(blockchain))
+app.post('/blocks/notify',
+  celebrate({
+    body: Joi.object().keys({
+    })
+  }), nodeCtrl.notify(blockchain))
 app.get('/peers', nodeCtrl.getPeers(blockchain))
-app.post('/peers', nodeCtrl.addPeer(blockchain))
-
+app.post('/peers',
+  celebrate({
+    body: Joi.object().keys({
+    })
+  }), nodeCtrl.addPeer(blockchain))
 app.post('/transactions/send',
   celebrate({
     body: Joi.object().keys({
@@ -36,12 +43,18 @@ app.post('/transactions/send',
       senderSignature: Joi.array().required()
     })
   }), nodeCtrl.createTransaction(blockchain))
-
 app.get('/transactions/:transactionHash/info', nodeCtrl.getTransactionInfo(blockchain))
 app.get('/balance/:address/confirmations/:confirmations', nodeCtrl.getBalance(blockchain))
 app.get('/balance/:address', nodeCtrl.getBalance(blockchain))
-app.post('/mining/get-block/:minerAddr', nodeCtrl.getMiningBlock)
-app.post('/mining/submit-block/:minerAddr', nodeCtrl.postPOW)
+app.get('/mining/get-block/:address', nodeCtrl.getMiningBlock(blockchain))
+app.post('/mining/submit-block/:address',
+  celebrate({
+    body: Joi.object().keys({
+      nonce: Joi.string().required(),
+      dateCreated: Joi.string().required(),
+      blockHash: Joi.string().required()
+    })
+  }), nodeCtrl.postPOW(blockchain))
 app.all('*', (req, res) => res.sendStatus(404))
 
 app.listen(port, () => (console.log('Express server listening on port ' + port)))

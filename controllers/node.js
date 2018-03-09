@@ -60,14 +60,14 @@ module.exports.createTransaction = (blockchain) => {
     }
 
     const transaction = blockchain.createTransaction(data)
-    if (blockchain.hasTransaction(transaction.hash) || !transaction.isValid(data.senderSignature)) {
+    if (blockchain.hasTransaction(transaction.hash) ||
+      !transaction.isValid(data.senderSignature)) {
       return res.sendStatus(400)
     }
 
     blockchain.addTransaction(transaction)
 
-    // Sends the transaction to all peer nodes through the REST API
-    // The transaction is sent from peer to peer until it reaches the entire network
+    this.notifyPeersOnNewBlock(transaction)
 
     res.status(201).send({
       "transactionHash": transaction.transactionHash
@@ -114,23 +114,30 @@ module.exports.getBalance = (blockchain) => {
 
 module.exports.getMiningBlock = (blockchain) => {
   return (req, res) => {
-    res.send(blockchain.getMiningBlock())
+    const addr = req.params.address
+    const miningBlock = blockchain.getMiningBlock(addr)
+    res.send({
+      index: miningBlock.index,
+      transactionsIncluded: miningBlock.transactions.length,
+      expectedReward: blockchain.minerReward,
+      blockDataHash: miningBlock.blockDataHash
+    })
   }
 }
 
 module.exports.postPOW = (blockchain) => {
   return (req, res) => {
     const data = req.body
-    const block = blockchain.createBlock(data)
+    const addr = req.params.address
+    const block = blockchain.getBlockByAddr(addr)
 
-    if (!block.isValid()) {
-      res.sendStatus(400)
+    if (!blockchain.isBlockValid(block, data)) {
+      return res.sendStatus(400)
     }
 
-    blockchain.addBlock(req.body)
-    blockchain.incBalance(block.minedBy, blockchain.minerReward)
+    blockchain.addBlock(block, data)
 
-    this.notifyPeers(block.index, blockchain.getCummulativeDifficulty(block.difficulty))
+    this.notifyPeersOnNewBlock(block.index, blockchain.getCummulativeDifficulty(block.difficulty))
 
     res.send({
       status: 'accepted',
@@ -139,7 +146,15 @@ module.exports.postPOW = (blockchain) => {
   }
 }
 
-const notifyPeers = (index, cummulativeDifficulty) => {
+const notifyPeersOnNewBlock = (index, cummulativeDifficulty) => {
+  const peers = blockchain.getPeers()
+
+  peers.forEach(url => {
+    // Notify
+  });
+}
+
+const notifyPeersOnNewTransaction = (transaction) => {
   const peers = blockchain.getPeers()
 
   peers.forEach(url => {

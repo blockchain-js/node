@@ -13,6 +13,7 @@ class Blockchain {
     this.peers = []
     this.minerReward = 500
     this.confirmations = 8
+    this.miners = {}
   }
 
   getCummulativeDifficulty(difficulty) {
@@ -21,6 +22,7 @@ class Blockchain {
 
   createGenesisBlock() {
     const initialTransaction = {
+      index: 0,
       from: '0x00',
       to: '0x00',
       value: 0,
@@ -43,13 +45,27 @@ class Blockchain {
     return this.blocks
   }
 
-  addBlock(blockToAdd) {
-    // Filter pending transactions
-    // Update the transactions
+  addBlock(blockToAdd, minerData) {
+    const block = new Block(
+      blockToAdd.index, 
+      blockToAdd.transactions, 
+      blockToAdd.difficulty, 
+      blockToAdd.prevBlockHash, 
+      blockToAdd.minedBy, 
+      minerData.blockHash,
+      minerData.nonce,
+      minerData.dateCreated
+    )
 
-    blockToAdd.prevBlockHash = this.getLatestBlock().blockHash
-    blockToAdd.blockHash = blockToAdd.calculateHash()
     this.blocks.push(blockToAdd)
+
+    this.transactions = this.transactions.concat(block.transactions)
+    const transactionHashes = this.transactions.map(tr => tr.transactionHash)
+    this.pendingTransactions = this.pendingTransactions.filter(tr => {
+      return !transactionHashes.includes(tr.transactionHash)
+    })
+
+    return block
   }
 
   createTransaction(transactionData) {
@@ -111,14 +127,6 @@ class Blockchain {
     return balance
   }
 
-  decBalance(addr, value) {
-    // Create transaction
-  }
-
-  incBalance(addr, value) {
-    // Create transaction
-  }
-
   addPeer(url) {
     this.peers.push(url)
   }
@@ -127,12 +135,33 @@ class Blockchain {
     return this.peers
   }
 
-  getMiningBlock() {
-
+  getMiningBlock(addr) {
+    const index = this.blocks.length
+    const transactions = this.pendingTransactions.map(tr => {
+      return Object.create({}, tr, {
+        transferSuccessful: true,
+        minedInBlockIndex: index
+      })
+    })
+    const coinbaseTransaction = Transaction.getCoinbaseTransaction(addr, this.minerReward, index)
+    const blockCandidate = Block.getBlockCandidate(addr, index, [coinbaseTransaction].concat(this.transactions), this.minerReward, this.getLatestBlock().blockHash, this.difficulty)
+    this.miners[addr] = blockCandidate
+    return blockCandidate
   }
 
   getTransactionInfo(hash) {
     return this.transactions.find(t => t.transactionHash === hash)
+  }
+
+  getBlockByAddr(addr) {
+    return this.miners[addr]
+  }
+
+  isBlockValid(blockCandidate, minerData) {
+    if(minerData.nonce.slice(0, this.difficulty) === [...Array(this.difficulty)].map((v,i)=>0).join('')) {
+      return true
+    }
+    return false
   }
 }
 

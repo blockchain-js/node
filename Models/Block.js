@@ -1,30 +1,38 @@
-const crypto = require('crypto')
+const crypto = require('../utils/crypto')
 const transaction = require('./Transaction')
 
 class Block {
+  static getBlockCandidate(minedBy, index, transactions, reward, prevBlockHash, difficulty) {
+    const dateCreated = new Date()
+    const blockDataHash = crypto.createHash({
+      index,
+      transactions,
+      difficulty,
+      prevBlockHash,
+      minedBy,
+      dateCreated
+    })
+
+    return {
+      index,
+      transactions,
+      difficulty,
+      prevBlockHash,
+      minedBy,
+      dateCreated,
+      blockDataHash
+    }
+  }
+
   constructor(index, transactions, difficulty, prevBlockHash, minedBy, blockDataHash, blockHash, nonce, dateCreated) {
     this.index = index
     this.transactions = transactions
     this.difficulty = difficulty
     this.prevBlockHash = prevBlockHash
     this.minedBy = minedBy
-    this.blockDataHash = blockDataHash
     this.nonce = nonce
     this.dateCreated = dateCreated
-    this.blockHash = this.calculateHash()
-  }
-
-  calculateHash() {
-    return crypto.createHash('sha256').update({
-      index: this.index,
-      transactions: this.transactions,
-      difficulty: this.difficulty,
-      prevBlockHash: this.prevBlockHash,
-      minedBy: this.minedBy,
-      blockDataHash: this.blockDataHash,
-      nonce: this.nonce,
-      dateCreated: this.dateCreated
-    }.toString()).digest('hex')
+    this.blockHash = blockHash
   }
 }
 
