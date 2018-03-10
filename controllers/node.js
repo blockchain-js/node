@@ -45,10 +45,8 @@ module.exports.getPeers = (blockchain) => {
   }
 }
 
-module.exports.addPeer = (blockchain) => {
-  return (req, res) => {
-    blockchain.addPeer(req.body.url)
-  }
+module.exports.addPeer = (blockchain, url) => {
+  blockchain.addPeer(url)
 }
 
 module.exports.createTransaction = (blockchain) => {
@@ -133,7 +131,7 @@ module.exports.postPOW = (blockchain) => {
     const addr = req.params.address
     const block = blockchain.getBlockByAddr(addr)
 
-    if (!blockchain.isBlockValid(block, data)) {
+    if (!block || !blockchain.isBlockValid(block, data)) {
       return res.sendStatus(400)
     }
 
@@ -152,7 +150,7 @@ const notifyPeersOnNewBlock = (blockchain, index, cummulativeDifficulty) => {
   const peers = blockchain.getPeers()
 
   peers.forEach(url => {
-    // Notify
+    // TODO
   });
 }
 
@@ -160,6 +158,6 @@ const notifyPeersOnNewTransaction = (blockchain, transaction) => {
   const peers = blockchain.getPeers()
 
   peers.forEach(url => {
-    // Notify
+    // TODO
   });
 }

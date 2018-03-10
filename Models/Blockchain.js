@@ -46,6 +46,7 @@ class Blockchain {
   }
 
   addBlock(blockToAdd, minerData) {
+    this.miners = {}
     const block = new Block(
       blockToAdd.index, 
       blockToAdd.transactions, 
@@ -66,6 +67,10 @@ class Blockchain {
     })
 
     return block
+  }
+
+  appendBlock(blockToAdd) {
+    this.blocks.push(blockToAdd)
   }
 
   createTransaction(transactionData) {
@@ -147,8 +152,16 @@ class Blockchain {
         minedInBlockIndex: index
       })
     })
+    const prevBlock = this.getLatestBlock()
     const coinbaseTransaction = Transaction.getCoinbaseTransaction(addr, this.minerReward, index)
-    const blockCandidate = Block.getBlockCandidate(addr, index, [coinbaseTransaction].concat(this.pendingTransactions), this.minerReward, this.getLatestBlock().blockHash, this.difficulty)
+    const blockCandidate = Block.getBlockCandidate(
+      addr, 
+      index, 
+      [coinbaseTransaction].concat(this.pendingTransactions), 
+      this.minerReward, 
+      prevBlock.blockHash, 
+      this.difficulty
+    )
     this.miners[addr] = blockCandidate
     return blockCandidate
   }
