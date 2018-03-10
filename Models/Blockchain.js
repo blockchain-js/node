@@ -24,8 +24,8 @@ class Blockchain {
     const initialTransaction = {
       index: 0,
       from: '0x00',
-      to: '048316b3d054db28e2ebf1a19cff0d6592dfb78f',
-      value: 500,
+      to: '0x00',
+      value: 0,
       fee: 0,
       transactions: [],
       senderPubKey: '',

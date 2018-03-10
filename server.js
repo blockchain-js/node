@@ -23,12 +23,15 @@ app.get('/blocks/:index', nodeCtrl.getBlockByIndex(blockchain))
 app.post('/blocks/notify',
   celebrate({
     body: Joi.object().keys({
+      index: Joi.string().required(),
+      cumulativeDifficulty: Joi.string().required()
     })
   }), nodeCtrl.notify(blockchain))
 app.get('/peers', nodeCtrl.getPeers(blockchain))
 app.post('/peers',
   celebrate({
     body: Joi.object().keys({
+      url: Joi.string().required()
     })
   }), nodeCtrl.addPeer(blockchain))
 app.post('/transactions/send',
