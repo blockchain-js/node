@@ -3,7 +3,7 @@ const crypto = require('../utils/crypto')
 
 class Transaction {
   static getCoinbaseTransaction(addr, value, blockIndex) {
-    const dateCreated = new Date()
+    const dateCreated = new Date().getTime()
     const transactionHash = crypto.createHash({
       from: '0x00',
       to: addr,

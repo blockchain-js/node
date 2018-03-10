@@ -120,7 +120,8 @@ module.exports.getMiningBlock = (blockchain) => {
       index: miningBlock.index,
       transactionsIncluded: miningBlock.transactions.length,
       expectedReward: blockchain.minerReward,
-      blockDataHash: miningBlock.blockDataHash
+      blockDataHash: miningBlock.blockDataHash,
+      difficulty: blockchain.difficulty
     })
   }
 }
@@ -128,6 +129,7 @@ module.exports.getMiningBlock = (blockchain) => {
 module.exports.postPOW = (blockchain) => {
   return (req, res) => {
     const data = req.body
+    console.log(JSON.stringify(req.body))
     const addr = req.params.address
     const block = blockchain.getBlockByAddr(addr)
 

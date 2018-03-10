@@ -34,7 +34,7 @@ class Blockchain {
       minedInBlockIndex: '',
       transferSuccessful: true
     }
-    return new Block(0, [initialTransaction], 0, '', '', '', '', '', '', new Date())
+    return new Block(0, [initialTransaction], 0, '', '', '', '', '', '', new Date().getTime())
   }
 
   getLatestBlock() {
@@ -87,7 +87,9 @@ class Blockchain {
       .reduce((val, tr) => {
         if (tr.from === addr) {
           val -= tr.value
-        } else if (tr.to === addr) {
+        } 
+        
+        if (tr.to === addr) {
           val += tr.value
         }
 
@@ -98,7 +100,7 @@ class Blockchain {
   }
 
   getBalance(addr, confirmations) {
-    const blocks = this.blocks || []
+    let blocks = this.blocks || []
     if (confirmations) {
       if (blocks.length < confirmations) {
         return 0
@@ -113,7 +115,9 @@ class Blockchain {
       .reduce((val, tr) => {
         if (tr.from === addr) {
           val -= tr.value
-        } else if (tr.to === addr) {
+        } 
+        
+        if (tr.to === addr) {
           val += tr.value
         }
 
@@ -138,13 +142,13 @@ class Blockchain {
   getMiningBlock(addr) {
     const index = this.blocks.length
     const transactions = this.pendingTransactions.map(tr => {
-      return Object.create({}, tr, {
+      return Object.assign({}, tr, {
         transferSuccessful: true,
         minedInBlockIndex: index
       })
     })
     const coinbaseTransaction = Transaction.getCoinbaseTransaction(addr, this.minerReward, index)
-    const blockCandidate = Block.getBlockCandidate(addr, index, [coinbaseTransaction].concat(this.transactions), this.minerReward, this.getLatestBlock().blockHash, this.difficulty)
+    const blockCandidate = Block.getBlockCandidate(addr, index, [coinbaseTransaction].concat(this.pendingTransactions), this.minerReward, this.getLatestBlock().blockHash, this.difficulty)
     this.miners[addr] = blockCandidate
     return blockCandidate
   }
@@ -158,10 +162,10 @@ class Blockchain {
   }
 
   isBlockValid(blockCandidate, minerData) {
-    if(minerData.nonce.substring(0, this.difficulty) === Array(this.difficulty).join('0')) {
-      return true
+    if(minerData.blockHash.substring(0, this.difficulty) !== Array(this.difficulty + 1).join('0')) {
+      return false
     }
-    return false
+    return true
   }
 }
 

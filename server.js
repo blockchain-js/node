@@ -53,8 +53,8 @@ app.get('/mining/get-block/:address', nodeCtrl.getMiningBlock(blockchain))
 app.post('/mining/submit-block/:address',
   celebrate({
     body: Joi.object().keys({
-      nonce: Joi.string().required(),
-      dateCreated: Joi.string().required(),
+      nonce: Joi.number().required(),
+      dateCreated: Joi.number().required(),
       blockHash: Joi.string().required()
     })
   }), nodeCtrl.postPOW(blockchain))

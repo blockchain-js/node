@@ -3,7 +3,7 @@ const transaction = require('./Transaction')
 
 class Block {
   static getBlockCandidate(minedBy, index, transactions, reward, prevBlockHash, difficulty) {
-    const dateCreated = new Date()
+    const dateCreated = new Date().getTime()
     const blockDataHash = crypto.createHash({
       index,
       transactions,
