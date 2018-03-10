@@ -61,13 +61,13 @@ module.exports.createTransaction = (blockchain) => {
 
     const transaction = blockchain.createTransaction(data)
     if (blockchain.hasTransaction(transaction.hash) ||
-      !transaction.isValid(data.senderSignature)) {
+      !transaction.isValid()) {
       return res.sendStatus(400)
     }
 
     blockchain.addTransaction(transaction)
 
-    this.notifyPeersOnNewBlock(transaction)
+    notifyPeersOnNewTransaction(blockchain, transaction)
 
     res.status(201).send({
       "transactionHash": transaction.transactionHash
@@ -137,7 +137,7 @@ module.exports.postPOW = (blockchain) => {
 
     blockchain.addBlock(block, data)
 
-    this.notifyPeersOnNewBlock(block.index, blockchain.getCummulativeDifficulty(block.difficulty))
+    notifyPeersOnNewBlock(blockchain, block.index, blockchain.getCummulativeDifficulty(block.difficulty))
 
     res.send({
       status: 'accepted',
@@ -146,7 +146,7 @@ module.exports.postPOW = (blockchain) => {
   }
 }
 
-const notifyPeersOnNewBlock = (index, cummulativeDifficulty) => {
+const notifyPeersOnNewBlock = (blockchain, index, cummulativeDifficulty) => {
   const peers = blockchain.getPeers()
 
   peers.forEach(url => {
@@ -154,7 +154,7 @@ const notifyPeersOnNewBlock = (index, cummulativeDifficulty) => {
   });
 }
 
-const notifyPeersOnNewTransaction = (transaction) => {
+const notifyPeersOnNewTransaction = (blockchain, transaction) => {
   const peers = blockchain.getPeers()
 
   peers.forEach(url => {

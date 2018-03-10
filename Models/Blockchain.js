@@ -24,8 +24,8 @@ class Blockchain {
     const initialTransaction = {
       index: 0,
       from: '0x00',
-      to: '0x00',
-      value: 0,
+      to: '048316b3d054db28e2ebf1a19cff0d6592dfb78f',
+      value: 500,
       fee: 0,
       transactions: [],
       senderPubKey: '',
@@ -69,7 +69,7 @@ class Blockchain {
   }
 
   createTransaction(transactionData) {
-    return new Transaction(transactionData.from, transactionData.to, transactionData.value, transactionData.fee, transactionData.senderPubKey, transactionData.dateCreated)
+    return new Transaction(transactionData.from, transactionData.to, transactionData.value, transactionData.fee, transactionData.senderPubKey, transactionData.dateCreated, transactionData.senderSignature)
   }
 
   hasTransaction(transactionHash) {
@@ -158,7 +158,7 @@ class Blockchain {
   }
 
   isBlockValid(blockCandidate, minerData) {
-    if(minerData.nonce.slice(0, this.difficulty) === [...Array(this.difficulty)].map((v,i)=>0).join('')) {
+    if(minerData.nonce.substring(0, this.difficulty) === Array(this.difficulty).join('0')) {
       return true
     }
     return false

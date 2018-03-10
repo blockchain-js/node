@@ -24,13 +24,14 @@ class Transaction {
     }
   }
 
-  constructor(from, to, value, fee, senderPubKey, date) {
+  constructor(from, to, value, fee, senderPubKey, date, senderSignature) {
     this.from = from
     this.to = to
     this.value = value
     this.fee = fee
     this.dateCreated = new Date(date).getTime()
     this.senderPubKey = senderPubKey
+    this.senderSignature = senderSignature
     this.transactionHash = this.getTransactionHash()
   }
 
@@ -46,18 +47,26 @@ class Transaction {
     })
   }
 
-  isValid(senderSignature) {
+  isValid() {
     const ec = new EC('secp256k1')
 
-    if (!senderSignature &&
-      senderSignature.length !== 2) {
+    const msg = crypto.createHash({
+      from: this.from,
+      to: this.to,
+      senderPubKey: this.senderPubKey,
+      value: this.value + '',
+      fee: this.fee + '',
+      dateCreated: this.dateCreated
+    })
+
+    if (!this.senderSignature &&
+      this.senderSignature.length !== 2) {
       return false
     }
-    var signature = { r: senderSignature[0], s: senderSignature[1] }
-    // var key = ec.keyFromPublic(this.senderPubKey, 'hex');
+    var signature = { r: this.senderSignature[0], s: this.senderSignature[1] }
+    var key = ec.keyFromPublic(this.senderPubKey, 'hex');
 
-    // return key.verify(msg, signature)
-    return true
+    return key.verify(msg, signature)
   }
 }
 
